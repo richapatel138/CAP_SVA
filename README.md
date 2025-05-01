@@ -1,55 +1,56 @@
 # CAP - `coloc` Automation Pipeline
 ## Authors: Emil Cacayan, Cian Dotson, Richa Patel
-### Table of Contents
-* **[Introduction](#introduction)**
-* **[Data](#data)**
-* **[CAP Workflow](#cap-workflow)**
-* **[Usage](#usage)**
-	* **[Dependencies](#dependencies)**
-	* **[Input Specifications](#input-specifications)**
-		* **[Specifications for Gene Input Data](#specifications-for-gene-input-data)**
-		* **[Linkage Disequilibrium Data](#linkage-disequilibrium-data)**
-	* **[The `config.ini` File](#the-configini-file)**
-	* **[Command Arguments](#command-arguments)**
-* **[References](#references)**
 
 ### Introduction
 This pipeline provides an intuitive approach to colocalization, capable of processing ARIC-formatted pQTLs, GTEx-formatted eQTLs, and GWAS summary statistics. It tests for shared genetic signals between GWAS and QTL data by identifying overlapping causal variants, helping to pinpoint or features that are not only associated with a trait but also have their expression influenced by the same variants. Building on previous work, this pipeline allows users to input a list of genes and run colocalization analysis without modifying the script for each iteration.
 
 ### Data
-This pipeline is a modification of a pipeline created to generate colocalization for pQTL data in a paper published detailing a proteome association study of breast, prostate, ovarian, and endometrial cancers (Gregga). The intended use of this pipeline is to be a general-use pipeline to run colocalization analyses across an array of data inputs for both eQTL and pQTl data, as opposed to the hard-coded inputs used in the study. The data provided for testing is a truncated version of the data used in the aforementioned study. 
+This pipeline is a modification of a pipeline created to generate colocalization for pQTL data in a paper published detailing a proteome association study of breast, prostate, ovarian, and endometrial cancers (Gregga et al. 2023). The intended use of this pipeline is to be a general-use pipeline to run colocalization analyses across an array of data inputs for both eQTL and pQTl data, as opposed to the hard-coded inputs used in the study. The data provided for testing is a truncated version of the data used in the aforementioned study. 
 
 ### CAP Workflow
-
-### Usage
-Please note - all of the standard output for the scripts are sent to the `CAP.log` created in the directory upon running the script. To view progress of the pipeline or if any troubleshooting is necessary, please view the output in the log file. The log file is refreshed upon each run of the pipeline. 
 
 #### Dependencies
 This pipeline is designed for a Unix environment, and requires the following software to function:
 * [Linux/Unix](https://www.linux.org/pages/download/)
 * [Python3](https://www.python.org/downloads/)
-* [plink2](https://www.cog-genomics.org/plink/2.0/)
-* [bcftools](https://www.htslib.org/download/)
+* [R](https://www.r-project.org/)  
 
-In addition to this software, the following `R` packages are utilized (which are automatically installed and loaded by the pipeline if not yet installed):
-* [`data.table`](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html)
-* [`dplyr`](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html)
-* [`coloc`](https://chr1swallace.github.io/coloc/)
-* [`hash`](https://cran.r-project.org/web/packages/hash/index.html)
-* [`optparse`](https://cran.r-project.org/web/packages/optparse/index.html)
-* [`R.utils`](https://cran.r-project.org/web/packages/R.utils/index.html)
-* [`stringr`](https://cran.r-project.org/web/packages/stringr/index.html)
+### R Packages Used in the Pipeline
+
+The following R packages are automatically installed (if not already present) and loaded silently by the pipeline. However, if any issues arise, please use the following links to troubleshoot. 
+
+- [`data.table`](https://cran.r-project.org/web/packages/data.table/index.html)
+- [`dplyr`](https://cran.r-project.org/web/packages/dplyr/index.html)
+- [`coloc`](https://chr1swallace.github.io/coloc/)
+- [`hash`](https://cran.r-project.org/web/packages/hash/index.html)
+- [`optparse`](https://cran.r-project.org/web/packages/optparse/index.html)
+- [`R.utils`](https://cran.r-project.org/web/packages/R.utils/index.html)
+- [`ggplot2`](https://cran.r-project.org/web/packages/ggplot2/index.html)
+- [`httr`](https://cran.r-project.org/web/packages/httr/index.html)
+- [`jsonlite`](https://cran.r-project.org/web/packages/jsonlite/index.html)
+- [`locuscomparer`](https://github.com/boxiangliu/locuscomparer)
+
 
 #### Input Specifications
-##### Specifications for Gene Input Data
-As mentioned, this pipeline accepts ARIC-formatted pQTLs or GTEx-formatted eQTLs and GWAS summary statistics to perform colocalization. Due to the lack of a consensus in the format of GWAS, eQTL, and pQTL data, we ask that the following information be included in GWAS, eQTL, and pQTL data with well-defined column names, entered in the [`config.ini`](#the-configini-file) file:
+As mentioned, this pipeline accepts ARIC-formatted pQTLs or GTEx-formatted eQTLs and GWAS summary statistics to perform colocalization. Due to the lack of a consensus in the format of GWAS, eQTL, and pQTL data, we ask that the following information be included. For ease of use, please enter it in the [`config.ini`](#the-configini-file) file:
 
-* Chromosome number
-* Base pair position
-* Effect Allele
-* Alternate allele
-* BETA value
-* Standard Error 
+##### The `config.ini` File
+- `process`: Indicates the type of QTL data being used. Acceptable values are typically:
+  - `eqtl`: expression Quantitative Trait Loci, denote in config file with "eqtl"
+  - `pqtl`: protein Quantitative Trait Loci, deafult, leave blank in config file
+- `genes`: A file containing gene names or identifiers to be analyzed. For specific formatting instructions, refer to the section below.
+- `seqIDdir`: Directory path for the ARIC pQTLs `seqid.txt` file. Only needed if using pQTL data.
+- `GWASdir`: Directory containing Genome-Wide Association Study (GWAS) summary statistics.
+- `pQTLdir`: Directory containing pQTL (protein QTL) summary statistics files. Only needed if using pQTL data.
+- `eQTLdir`: Directory containing eQTL (expression QTL) summary statistics files. Only needed if using eQTL data.
+- `CHR_input`: The column name in the input data that specifies the chromosome (e.g., `"CHR"`).
+- `BP_input`: The column name indicating the base pair position (e.g., `"POS"` or `"BP"`).
+- `A1_input`: The column name for the effect allele (also called the alternative allele or minor allele).
+- `A2_input`: The column name for the reference or non-effect allele.
+- `BETA_input`: The column name for the effect size estimate (e.g., regression coefficient).
+- `SE_input`: The column name for the standard error of the effect size estimate.
+- `ID_input`: The column name containing SNP IDs or variant identifiers (e.g., `"rsid"`). Only needed if using eQTL data.
+- `outputdir`: Name of directory where all output files (plots, results tables, logs) will be written. This will be generated for you.
 
 This pipeline runs two colocalization procedures with the `coloc` package in `R`, the first being the assumption of 0 or 1 causal variant in each trait (single variant assumption), and the other is the understanding that multiple causal variants can be involved in the shared genetic influence between two traits (multiple variant assumption). The former is a trivial task, but the latter requires linkage disequilibrium data (represented as a correlation matrix between SNP's) to help cluster tightly linked variants and decrease artificially inflated false positive rates. 
 
@@ -63,18 +64,6 @@ In order to select regions of interest, the pipeline requires a list of genes to
 * **Using ARIC-formatted pQTLs**
 	* A `.txt` file with newline-separated data. The first line is a header indicating the column content. Each subsequent line contains the gene using its gene symbol (e.g. LAYN, PTEN, TP53I3, etc.).
 
-##### The `config.ini` File
-To reduce the verboseness of running the pipeline, a `config.ini` file is included in the repository. This file stores user-specified information for directories and preferences for the pipeline. Each section has the following keys which must be assigned values as followed:
-* **`genes`**: Path to where the list of genes of interest is located. For specific formatting instructions, refer to the section above.
-* **`seqIDdir`**: File path for the ARIC pQTLs `seqid.txt` file. Only needed if using pQTL data.
-* **`data_dir`**: Directory where either eQTL or pQTL data is stored. 
-* **`CHR_input`**: The column name in the GWAS summary statistics for chromosome number.
-* **`BP_input`**: The column name in the GWAS summary statistics for base pair position.
-* **`A1_input`**: The column name in the GWAS summary statistics for the effect allele (A1).
-* **`A2_input`**: The column name in the GWAS summary statistics for the alternate allele (A2).
-* **`BETA_input`**: The column name in the GWAS summary statistics for the regression coefficient (BETA).
-* **`SE_input`**: The column name in the GWAS summary statistics for standard error (SE). 
-* **`LD_dir`**: Location of the LD data directory if not using pipeline to download from the internet. This will be ignored if the command line flag `-l`/`--lddownload` is set to true. 
 
 ##### Command Arguments
 To run the script, please clone the repository:
