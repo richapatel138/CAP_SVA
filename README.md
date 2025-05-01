@@ -94,7 +94,7 @@ To run the pipeline using eQTL test data, use the following command:
 ```
 python3 wrapper.py --config "config_eqtl.ini"
 ```
-To run the pipeline using eQTL test data, use the following command:
+To run the pipeline using pQTL test data, use the following command:
 
 ```
 python3 wrapper.py --config "config_pqtl.ini"
