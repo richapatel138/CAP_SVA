@@ -1,24 +1,32 @@
-# Load essential libraries
-suppressPackageStartupMessages({
-  library(data.table)
-  library(dplyr)
-  library(coloc)
-  library(hash)
-  library(optparse)
-  library(R.utils)
-  library(ggplot2)
-  library(httr)
-  library(jsonlite)
-})
+# Install required packages if not already installed
+if (!require(data.table)) { install.packages("data.table") }
+if (!require(dplyr)) { install.packages("dplyr") }
+if (!require(coloc)) { install.packages("coloc") }
+if (!require(hash)) { install.packages("hash") }
+if (!require(optparse)) { install.packages("optparse") }
+if (!require(R.utils)) { install.packages("R.utils") }
+if (!require(ggplot2)) { install.packages("ggplot2") }
+if (!require(httr)) { install.packages("httr") }
+if (!require(jsonlite)) { install.packages("jsonlite") }
 
-# Install and load 'locuscomparer' if not already installed
-if (!requireNamespace("locuscomparer", quietly = TRUE)) {
-  if (!requireNamespace("devtools", quietly = TRUE)) {
+# Install and load 'locuscomparer' from GitHub if not already installed
+if (!require(locuscomparer)) {
+  if (!require(devtools)) {
     install.packages("devtools")
   }
   devtools::install_github("boxiangliu/locuscomparer")
 }
-library(locuscomparer)
+# Load libraries with suppressed messages
+suppressPackageStartupMessages(invisible(library(data.table)))
+suppressPackageStartupMessages(invisible(library(dplyr)))
+suppressPackageStartupMessages(invisible(library(coloc)))
+suppressPackageStartupMessages(invisible(library(hash)))
+suppressPackageStartupMessages(invisible(library(optparse)))
+suppressPackageStartupMessages(invisible(library(R.utils)))
+suppressPackageStartupMessages(invisible(library(ggplot2)))
+suppressPackageStartupMessages(invisible(library(httr)))
+suppressPackageStartupMessages(invisible(library(jsonlite)))
+suppressPackageStartupMessages(invisible(library(locuscomparer)))
 
 # Define a string concatenation operator
 `%&%` <- function(a, b) paste0(a, b)
