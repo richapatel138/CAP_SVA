@@ -76,54 +76,24 @@ To reduce the verboseness of running the pipeline, a `config.ini` file is includ
 * **`SE_input`**: The column name in the GWAS summary statistics for standard error (SE). 
 * **`LD_dir`**: Location of the LD data directory if not using pipeline to download from the internet. This will be ignored if the command line flag `-l`/`--lddownload` is set to true. 
 
-When specifying a directory (not a file), please denote with an extra `/` at the very end of the path, for example (a directory called 1000g_vcfs):
-
-```
-LD_dir = "data/1000g_vcfs/"
-```
-
-##### Linkage Disequilibrium Data
-The longest step involved in this pipeline is obtaining and processing the linkage disequilibrium data required for colocalization under the multiple variant hypothesis. There are a number of ways the pipeline streamlines this process.
-
-To create the LD correlation matrix, the corresponding `.vcf` files for all chromosomes must be downloaded from the [1000 Genomes Project phase 3 release](https://www.internationalgenome.org/data-portal/data-collection/phase-3). This pipeline has the capability to do this but the user can also download the data directly from [this directory](https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/) using the following command:
-
-```
-for chr in {1..22}; do
-  wget -c ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.chr${chr}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz
-done
-wget -c https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/working/20130606_sample_info/20130606_sample_info.txt
-```
-
-Save these to a directory and specify the directory in the [`config.ini`](#the-configini-file) under the `LD_dir` section. When running the `wrapper.py` script, please specify the flag `-l/--lddownload` as false, otherwise the directory in the `config.ini` file will be disregarded. The pipeline will verify that all files are present in the directory (not if they have been corrupted or are incomplete). 
-
-Otherwise, to make the pipeline download the data, simply run with the `-l/--lddownload` flag as true,  and a directory containing the data will be created for you in a directory called `1000g_vcfs`. If the folder is created and is complete, the pipeline will not download the data again and skip to processing.
-
-The processing step is also non-trivial, and the user can specify the number of threads to run processing with using the `-t/--threads` flag. This step involves the creation of a new directory called `LD_output`. Again, if this folder is present and complete (i.e. a round of processing on the downloaded data is already finished), then this step will not be repeated. The output of all processing is a correlation matrix to be used for colocalization.
-
 ##### Command Arguments
 To run the script, please clone the repository:
 ```
 git clone https://github.com/cacayan2/CAP.git
 ```
-The repository also contains a test data set that can be used to troubleshoot the pipeline. All of the scripts are managed by `wrapper.py`.
-
-To run the pipeline, use the following command:
+To run the pipeline, first ensure that all paths in the config file is accurate. The syntax to run the single variant analysis is: 
+```
+python3 wrapper.py --config "path_to_file.ini"
+```
+To run the pipeline using eQTL test data, use the following command:
 
 ```
-python3 wrapper.py -p <eqtl/pqtl> -t <t/f> -o <output> -s <superpop> -l <ld> -c <threads>
+python3 wrapper.py --config "config_eqtl.ini"
 ```
-Here is a brief explanation of all the command line arguments:
+To run the pipeline using eQTL test data, use the following command:
 
-* `-p/--process`: Specify whether using eQTL or pQTL data.
-	* Acceptable values: "eqtl", "pqtl"
-* `-t/--test`: Specify whether using test data or real data.
-	* Acceptable values: "True", "true", "T", "t", or "False", "false", "F", "f"
-* `-s/--superpop`: The subset of the population to use for generation of the linkage disequilibrium data. 
-	* Acceptable values: Please see below for a list of available populations.
-* `-l/--ld`: Specifies whether the pipeline will download the linkage disequilibrium data or if the user is providing linkage disequilibrium data. 
-	* Acceptable values: "True", "true", "T", "t", or "False", "false", "F", "f"
-* `-c/--threads`: The number of threads used for processing - ideal number of threads is environment dependent.
-	* Acceptable values: Whole number values up to the number of cores available on workspace.
+```
+python3 wrapper.py --config "config_pqtl.ini"
+```
 
-### References
 1. Gregga I, Pharoah PDP, Gayther SA, Manichaikul A, Im HK, Kar SP, Schildkraut JM, Wheeler HE. Predicted Proteome Association Studies of Breast, Prostate, Ovarian, and Endometrial Cancers Implicate Plasma Protein Regulation in Cancer Susceptibility. Cancer Epidemiol Biomarkers Prev. 2023 Sep 1;32(9):1198-1207. doi: 10.1158/1055-9965.EPI-23-0309. PMID: 37409955; PMCID: PMC10528410.
