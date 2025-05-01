@@ -79,9 +79,9 @@ To reduce the verboseness of running the pipeline, a `config.ini` file is includ
 ##### Command Arguments
 To run the script, please clone the repository:
 ```
-git clone https://github.com/cacayan2/CAP.git
+git clone https://github.com/richapatel138/CAP_SVA.git
 ```
-To run the pipeline, first ensure that all paths in the config file is accurate. The syntax to run the single variant analysis is: 
+To run the pipeline with other data, first ensure that all paths in the config file is accurate. The syntax to run the single variant analysis is: 
 ```
 python3 wrapper.py --config "path_to_file.ini"
 ```
