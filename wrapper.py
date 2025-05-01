@@ -20,7 +20,7 @@ config.read(args.config)
 params = config['default']
 
 # Start constructing the Rscript command
-r_command = ["Rscript", "DataPrepv5.R"]
+r_command = ["Rscript", "SVA.R"]
 
 # Conditionally add 'process' only if it is not empty
 if 'process' in params and params['process'].strip():
